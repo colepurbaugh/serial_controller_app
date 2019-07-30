@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+import 'package:usb_serial/usb_serial.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'serial_controller_app',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: new SerialForm(),
+    );
+  }
+}
+
+class SerialForm extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _SerialFormState();
+}
+
+class _SerialFormState extends State<SerialForm> {
+  
+  String _stateOfTheLock = 'The lock is UNKNOWN';
+
+  @override
+  Widget build(BuildContext context) {
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Open Dat Lock!'),
+        backgroundColor: Colors.blueAccent
+      ),
+      body: Container(
+        padding: EdgeInsets.all(15.0),
+        child: Column(
+           children: <Widget>[
+            RaisedButton(
+              color: Theme.of(context).primaryColorDark,
+              textColor: Theme.of(context).primaryColorLight,
+              onPressed: () {
+                setState ((){
+                  _operateTheLock(true);
+                });
+              },
+              child: Text(
+                'Open',
+                textScaleFactor: 1.5,
+              )
+            ),
+            RaisedButton(
+              color: Theme.of(context).primaryColorDark,
+              textColor: Theme.of(context).primaryColorLight,
+              onPressed: () {
+                setState ((){
+                  _operateTheLock(false);
+                });
+              },
+              child: Text(
+                'Close',
+                textScaleFactor: 1.5,
+              )
+            ),
+            Text(_stateOfTheLock),
+           ]
+        ),
+      ),
+    );
+  }
+
+  void _operateTheLock (bool value){
+    if (value){
+      _stateOfTheLock = 'The lock is OPEN';
+      //open the lock
+    } else {
+      _stateOfTheLock = 'The lock is CLOSED';
+      //close the lock
+    }
+  }
+}
