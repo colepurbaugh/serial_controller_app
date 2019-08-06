@@ -11,14 +11,14 @@ int whiteColorValue = 0;   //color 0-256
 int timeValue = 1000;      //time in ms
 int menuValue = 0;         //hidden menu for return values: status, temp, etc.
 
-void main() => runApp(MyApp());
+void main() => runApp(ControllerApp());
 
-class MyApp extends StatefulWidget {
+class ControllerApp extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _ControllerAppState createState() => _ControllerAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _ControllerAppState extends State<ControllerApp> {
   UsbPort _port;
   String _status = "Idle";
   List<Widget> _ports = [];
