@@ -4,6 +4,13 @@ import 'dart:async';
 import 'package:usb_serial/usb_serial.dart';
 import 'package:usb_serial/transaction.dart';
 
+int redColorValue = 0;     //color 0-256
+int greenColorValue = 0;   //color 0-256
+int blueColorValue = 0;    //color 0-256
+int whiteColorValue = 0;   //color 0-256
+int timeValue = 1000;      //time in ms
+int menuValue = 0;         //hidden menu for return values: status, temp, etc.
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -125,6 +132,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
         home: Scaffold(
           appBar: AppBar(
@@ -138,6 +146,7 @@ class _MyAppState extends State<MyApp> {
                 : "No serial devices available",
             style: Theme.of(context).textTheme.title),
         ..._ports,
+        // Lock Popper Section *****************************************************************
         Text('Status: $_status\n'),
         Text(" ", style: Theme.of(context).textTheme.title,),
         Text("Lock Popper", style: Theme.of(context).textTheme.title),
@@ -171,23 +180,103 @@ class _MyAppState extends State<MyApp> {
                   },
             ),
         ]),
+        // LED Controller Section *****************************************************************
         Text(" ", style: Theme.of(context).textTheme.title),
         Text("LED Controller", style: Theme.of(context).textTheme.title),
-        new Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RaisedButton(
-            child: Text("Red"),
+        //Red Slider
+        Slider(
+          value: redColorValue.toDouble(),
+          min: 0.0,
+          max: 256.0,
+          divisions: 256,
+          label: 'red',
+          onChanged: (double newValue){
+            setState(() {
+              redColorValue = newValue.toInt();
+            });
+          },
+        ),
+        //Green Slider
+        Slider(
+          value: greenColorValue.toDouble(),
+          min: 0.0,
+          max: 256.0,
+          divisions: 256,
+          label: 'green',
+          onChanged: (double newValue){
+            setState(() {
+              greenColorValue = newValue.toInt();
+            });
+          },
+        ),
+        //Blue Slider
+        Slider(
+          value: blueColorValue.toDouble(),
+          min: 0.0,
+          max: 256.0,
+          divisions: 256,
+          label: 'blue',
+          onChanged: (double newValue){
+            setState(() {
+              blueColorValue = newValue.toInt();
+            });
+          },
+        ),
+        //White Slider
+        Slider(
+          value: whiteColorValue.toDouble(),
+          min: 0.0,
+          max: 256.0,
+          divisions: 256,
+          label: 'white',
+          onChanged: (double newValue){
+            setState(() {
+              whiteColorValue = newValue.toInt();
+            });
+            _port == null
+                ? null
+                : () async {
+                  if (_port == null) {
+                    return;
+                  }
+                  String data = ledControllerCommand();
+                  await _port.write(Uint8List.fromList(data.codeUnits));
+                  _textController.text = "";
+                };
+          },
+        ),
+
+        Text("Command Sent: " + ledControllerCommand(),
+          style: Theme.of(context).textTheme.title),
+        RaisedButton(
+            child: Text("Send"),
             onPressed: _port == null
                 ? null
                 : () async {
                     if (_port == null) {
                       return;
                     }
-                    String data = "100.0.0.0.1000";
+                    String data = ledControllerCommand();
                     await _port.write(Uint8List.fromList(data.codeUnits));
                     _textController.text = "";
                   },
+          ),
+        /*
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            RaisedButton(
+              child: Text("Red"),
+              onPressed: _port == null
+                ? null
+                : () async {
+                  if (_port == null) {
+                    return;
+                  }
+                  String data = "100.0.0.0.1000";
+                  await _port.write(Uint8List.fromList(data.codeUnits));
+                  _textController.text = "";
+                },
             ),
             RaisedButton(
             child: Text("Green"),
@@ -217,6 +306,8 @@ class _MyAppState extends State<MyApp> {
             ),
           ]
         ),
+        */
+        // Custom Command Section *****************************************************************
         Text(" ", style: Theme.of(context).textTheme.title),
         Text("Custom Commands", style: Theme.of(context).textTheme.title),
         ListTile(
@@ -246,5 +337,16 @@ class _MyAppState extends State<MyApp> {
         ..._serialData,
       ])),
     ));
+  }
+
+  String ledControllerCommand (){
+    String val = redColorValue.toString() + "." +
+      greenColorValue.toString() + "." + 
+      blueColorValue.toString() + "." + 
+      whiteColorValue.toString() + "." + 
+      timeValue.toString() + "." + 
+      menuValue.toString();
+
+    return val;
   }
 }
