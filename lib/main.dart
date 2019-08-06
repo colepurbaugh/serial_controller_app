@@ -4,12 +4,12 @@ import 'dart:async';
 import 'package:usb_serial/usb_serial.dart';
 import 'package:usb_serial/transaction.dart';
 
-int redColorValue = 0;     //color 0-256
-int greenColorValue = 0;   //color 0-256
-int blueColorValue = 0;    //color 0-256
-int whiteColorValue = 0;   //color 0-256
-int timeValue = 1000;      //time in ms
-int menuValue = 0;         //hidden menu for return values: status, temp, etc.
+int redColorValue = 0; //color 0-256
+int greenColorValue = 0; //color 0-256
+int blueColorValue = 0; //color 0-256
+int whiteColorValue = 0; //color 0-256
+int timeValue = 1000; //time in ms
+int menuValue = 0; //hidden menu for return values: status, temp, etc.
 
 void main() => runApp(ControllerApp());
 
@@ -132,13 +132,12 @@ class _ControllerAppState extends State<ControllerApp> {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
         home: Scaffold(
-          appBar: AppBar(
-            title: const Text('USB Serial Plugin example app'),
-        ),
-        body: Center(
+      appBar: AppBar(
+        title: const Text('USB Serial Plugin example app'),
+      ),
+      body: SingleChildScrollView (
           child: Column(children: <Widget>[
         Text(
             _ports.length > 0
@@ -148,14 +147,15 @@ class _ControllerAppState extends State<ControllerApp> {
         ..._ports,
         // Lock Popper Section *****************************************************************
         Text('Status: $_status\n'),
-        Text(" ", style: Theme.of(context).textTheme.title,),
+        Text(
+          " ",
+          style: Theme.of(context).textTheme.title,
+        ),
         Text("Lock Popper", style: Theme.of(context).textTheme.title),
-        new Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RaisedButton(
-              child: Text("Open"),
-              onPressed: _port == null
+        new Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          RaisedButton(
+            child: Text("Open"),
+            onPressed: _port == null
                 ? null
                 : () async {
                     if (_port == null) {
@@ -165,10 +165,10 @@ class _ControllerAppState extends State<ControllerApp> {
                     await _port.write(Uint8List.fromList(data.codeUnits));
                     _textController.text = "";
                   },
-            ),
-            RaisedButton(
-              child: Text("Close"),
-              onPressed: _port == null
+          ),
+          RaisedButton(
+            child: Text("Close"),
+            onPressed: _port == null
                 ? null
                 : () async {
                     if (_port == null) {
@@ -178,7 +178,7 @@ class _ControllerAppState extends State<ControllerApp> {
                     await _port.write(Uint8List.fromList(data.codeUnits));
                     _textController.text = "";
                   },
-            ),
+          ),
         ]),
         // LED Controller Section *****************************************************************
         Text(" ", style: Theme.of(context).textTheme.title),
@@ -190,7 +190,7 @@ class _ControllerAppState extends State<ControllerApp> {
           max: 256.0,
           divisions: 256,
           label: 'red',
-          onChanged: (double newValue){
+          onChanged: (double newValue) {
             setState(() {
               redColorValue = newValue.toInt();
             });
@@ -203,7 +203,7 @@ class _ControllerAppState extends State<ControllerApp> {
           max: 256.0,
           divisions: 256,
           label: 'green',
-          onChanged: (double newValue){
+          onChanged: (double newValue) {
             setState(() {
               greenColorValue = newValue.toInt();
             });
@@ -216,7 +216,7 @@ class _ControllerAppState extends State<ControllerApp> {
           max: 256.0,
           divisions: 256,
           label: 'blue',
-          onChanged: (double newValue){
+          onChanged: (double newValue) {
             setState(() {
               blueColorValue = newValue.toInt();
             });
@@ -229,28 +229,11 @@ class _ControllerAppState extends State<ControllerApp> {
           max: 256.0,
           divisions: 256,
           label: 'white',
-          onChanged: (double newValue){
+          onChanged: (double newValue) {
             setState(() {
               whiteColorValue = newValue.toInt();
             });
             _port == null
-                ? null
-                : () async {
-                  if (_port == null) {
-                    return;
-                  }
-                  String data = ledControllerCommand();
-                  await _port.write(Uint8List.fromList(data.codeUnits));
-                  _textController.text = "";
-                };
-          },
-        ),
-
-        Text("Command Sent: " + ledControllerCommand(),
-          style: Theme.of(context).textTheme.title),
-        RaisedButton(
-            child: Text("Send"),
-            onPressed: _port == null
                 ? null
                 : () async {
                     if (_port == null) {
@@ -259,8 +242,25 @@ class _ControllerAppState extends State<ControllerApp> {
                     String data = ledControllerCommand();
                     await _port.write(Uint8List.fromList(data.codeUnits));
                     _textController.text = "";
-                  },
-          ),
+                  };
+          },
+        ),
+
+        Text("Command Sent: " + ledControllerCommand(),
+            style: Theme.of(context).textTheme.title),
+        RaisedButton(
+          child: Text("Send"),
+          onPressed: _port == null
+              ? null
+              : () async {
+                  if (_port == null) {
+                    return;
+                  }
+                  String data = ledControllerCommand();
+                  await _port.write(Uint8List.fromList(data.codeUnits));
+                  _textController.text = "";
+                },
+        ),
         /*
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -335,17 +335,22 @@ class _ControllerAppState extends State<ControllerApp> {
 
         Text("Result Data", style: Theme.of(context).textTheme.title),
         ..._serialData,
-      ])),
-    ));
+      ]),
+    )));
   }
 
-  String ledControllerCommand (){
-    String val = redColorValue.toString() + "." +
-      greenColorValue.toString() + "." + 
-      blueColorValue.toString() + "." + 
-      whiteColorValue.toString() + "." + 
-      timeValue.toString() + "." + 
-      menuValue.toString();
+  String ledControllerCommand() {
+    String val = redColorValue.toString() +
+        "." +
+        greenColorValue.toString() +
+        "." +
+        blueColorValue.toString() +
+        "." +
+        whiteColorValue.toString() +
+        "." +
+        timeValue.toString() +
+        "." +
+        menuValue.toString();
 
     return val;
   }
